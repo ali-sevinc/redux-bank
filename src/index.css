@@ -1,0 +1,66 @@
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  margin: 40px;
+  background-color: #1e293b;
+  color: #f1f5f9;
+  text-align: center;
+}
+
+input,
+select {
+  margin: 0 8px;
+  padding: 4px 8px;
+  font: inherit;
+}
+
+button {
+  text-transform: uppercase;
+  font-weight: bold;
+  padding: 6px 8px;
+  cursor: pointer;
+}
+
+.inputs {
+  background-color: #f1f5f9;
+  padding: 32px;
+  color: #1e293b;
+  max-width: 30rem;
+  margin: 0 auto;
+  text-align: start;
+}
+.inputs div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+  justify-content: space-between;
+}
+.inputs div input {
+  width: 100%;
+}
+.inputs div label {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+.inputs > * + * {
+  margin-top: 20px;
+}
+
+.balance {
+  max-width: 30rem;
+  background-color: #f1f5f9;
+  padding: 12px 32px;
+  font-weight: bold;
+  font-size: 32px;
+  text-align: center;
+  color: #1e293b;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.balance p {
+  padding: 0;
+  font-size: 1.5rem;
+}
