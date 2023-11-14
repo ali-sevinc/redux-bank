@@ -46,7 +46,9 @@ function AccountOperations() {
   function handleRequestLoan() {
     if (!loanAmount || +loanAmount < 0 || isNaN(+loanAmount)) return;
     if (!loanPurpose) return;
-    dispatch(requestLoan(Number(loanAmount), loanPurpose));
+    dispatch(
+      requestLoan({ loanAmount: Number(loanAmount), loanPurpose: loanPurpose })
+    );
     setLoanAmount("");
     setLoanPurpose("");
   }

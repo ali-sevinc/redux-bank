@@ -1,6 +1,8 @@
 import { ThunkAction, ThunkDispatch } from "redux-thunk";
 import { useDispatch } from "react-redux";
 
+import { createSlice } from "@reduxjs/toolkit";
+
 export type AccountStateType = {
   balance: number;
   loan: number;
@@ -19,53 +21,11 @@ type AccountActionType = {
   purpose?: string;
 };
 
-const initialStateAccount: AccountStateType = {
-  balance: 0,
-  loan: 0,
-  loanPurpose: "",
-  isLoading: false,
-};
-
-export default function reducer(
-  state: AccountStateType = initialStateAccount,
-  action: AccountActionType
-) {
-  switch (action.type) {
-    case "account/deposit":
-      return {
-        ...state,
-        balance: state.balance + action.amount!,
-        isLoading: false,
-      } as AccountStateType;
-    case "account/withdraw":
-      return {
-        ...state,
-        balance: state.balance - action.amount!,
-      } as AccountStateType;
-    case "account/requestLoan":
-      if (state.loan > 0) return state;
-      return {
-        ...state,
-        balance: state.balance + action.loan!,
-        loan: action.loan,
-        loanPurpose: action.purpose!,
-      } as AccountStateType;
-    case "account/payLoan":
-      return {
-        ...state,
-        loan: 0,
-        loanPurpose: "",
-        balance: state.balance - state.loan,
-      } as AccountStateType;
-    case "account/loading":
-      return {
-        ...state,
-        isLoading: true,
-      };
-    default:
-      return state;
-  }
-}
+type DispatchType = ThunkDispatch<
+  AccountStateType,
+  undefined,
+  AccountActionType
+>;
 
 type DepositThunk = ThunkAction<
   void,
@@ -74,16 +34,46 @@ type DepositThunk = ThunkAction<
   AccountActionType
 >;
 
-type DispatchType = ThunkDispatch<
-  AccountStateType,
-  undefined,
-  AccountActionType
->;
+const initialStateAccount: AccountStateType = {
+  balance: 0,
+  loan: 0,
+  loanPurpose: "",
+  isLoading: false,
+};
 
-export const useAccountDispatch = () => useDispatch<DispatchType>();
+const accountSlice = createSlice({
+  name: "account",
+  initialState: initialStateAccount,
+  reducers: {
+    deposit(state, action) {
+      state.balance = state.balance + action.payload;
+      state.isLoading = false;
+    },
+    withdraw(state, action) {
+      state.balance = state.balance - action.payload;
+    },
+    requestLoan(state, action) {
+      if (state.loan > 0) return;
+      state.balance = state.balance + action.payload.loanAmount;
+      state.loan = action.payload.loanAmount;
+      state.loanPurpose = action.payload.loanPurpose;
+    },
+
+    payLoan(state) {
+      if (state.loan === 0) return;
+      state.balance = state.balance - state.loan;
+      state.loan = 0;
+      state.loanPurpose = "";
+    },
+    loading(state) {
+      state.isLoading = true;
+    },
+  },
+});
 
 export function deposit(amount: number, currency: string): DepositThunk {
   return async function (dispatch: DispatchType /*getState*/) {
+    console.log(amount, currency);
     dispatch({ type: "account/loading" });
     if (currency === "USD") {
       dispatch({ type: "account/deposit", amount });
@@ -94,31 +84,11 @@ export function deposit(amount: number, currency: string): DepositThunk {
 
       const resData = await res.json();
       const data = resData.rates.USD;
-      dispatch({ type: "account/deposit", amount: data });
+      dispatch({ type: "account/deposit", payload: data });
     }
   };
 }
+export const useAccountDispatch = () => useDispatch<DispatchType>();
+export const { payLoan, requestLoan, withdraw } = accountSlice.actions;
 
-export function withdraw(amount: number): {
-  type: "account/withdraw";
-  amount: number;
-} {
-  return { type: "account/withdraw", amount };
-}
-export function requestLoan(
-  amount: number,
-  purpose: string
-): {
-  type: "account/requestLoan";
-  loan: number;
-  purpose: string;
-} {
-  return {
-    type: "account/requestLoan",
-    loan: amount,
-    purpose: purpose,
-  };
-}
-export function payLoan(): { type: "account/payLoan" } {
-  return { type: "account/payLoan" };
-}
+export default accountSlice.reducer;

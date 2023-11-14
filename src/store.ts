@@ -1,7 +1,4 @@
-import { combineReducers, createStore, applyMiddleware } from "redux";
-import thunk from "redux-thunk";
-
-import { composeWithDevTools } from "@redux-devtools/extension";
+import { configureStore } from "@reduxjs/toolkit";
 
 import accountReducer, {
   AccountStateType,
@@ -15,14 +12,11 @@ export type RootType = {
   customer: CustomerStateType;
 };
 
-const rootReducer = combineReducers<RootType>({
-  account: accountReducer,
-  customer: customerReducer,
+const store = configureStore<RootType>({
+  reducer: {
+    account: accountReducer,
+    customer: customerReducer,
+  },
 });
-
-const store = createStore(
-  rootReducer,
-  composeWithDevTools(applyMiddleware(thunk))
-);
 
 export default store;
